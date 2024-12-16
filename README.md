@@ -217,10 +217,85 @@ snowflake trasformation
 - Data transformation is automated using Snowflake Tasks, which are scheduled to run periodically or in 
 response to data changes. These tasks execute SQL transformations on raw data in staging tables, 
 applying business logic, data cleaning, aggregation, and calculations to generate the required output.
-
-
 Once data is transformed, it is loaded into the target tables within Snowflake for analysis and reporting. 
 As transformation tasks run, the data in the target tables is updated in near real-time,
 ensuring it is readily available for querying by business users or reporting tools.
+```// create  station tabl
+create or replace table Dim_Station
+as
+select 
+    my_sq.nextval as Station_ID,
+    "Departure Station" as Dp_Station,
+    "Arrival Destination" as Arr_station
+from    
+    UK_DEMO.UK_SCHEMA.UK_RAILWAY_COMPANY;
+select * from  Dim_Station
+
+// create  the journey table 
+create or replace table   Dim_Journeys
+as
+SELECT
+    my_sq.nextval as Journey_ID,
+"Date of Journey" as Date_of_Journey,
+"Departure Time" as Departure_Time,
+"Arrival Time" as Arrival_Time,
+"Actual Arrival Time" as Actual_Arrival_Time,
+"Journey Status" as Journey_Status
+from    
+    UK_DEMO.UK_SCHEMA.UK_RAILWAY_COMPANY;
+
+//  create the refund table 
+create or replace table Dim_Refunds
+as 
+SELECT 
+    my_sq.nextval as Refund_ID,
+    "Reason for Delay" as Reason_for_Delay,
+    "Refund Request" as Refund_Request
+from    
+    UK_DEMO.UK_SCHEMA.UK_RAILWAY_COMPANY;
+
+//create  table Dim_Date
+create or replace table Dim_Date
+as
+ select 
+    my_sq.nextval as Date_ID,
+    "Date of Purchase" as Date_of_Purchase,
+    dayname(to_date("Date of Purchase")) as day_name ,
+    monthname(to_date("Date of Purchase")) as month_name,
+     year(to_date("Date of Purchase")) as Year,
+     QUARTER(to_date("Date of Purchase")) as Quanter,
+    HOUR("Time of Purchase"::time) as Hour_of_Purchase
+   
+from    
+    UK_DEMO.UK_SCHEMA.UK_RAILWAY_COMPANY;
+
+ select * from Dim_Date
+
+ // create the time table 
+ create or replace table  Dim_Time
+ as
+select 
+    my_sq.nextval as  Time_ID,
+    HOUR("Time of Purchase"::time) as Hour_of_Purchase,
+    Minute("Time of Purchase"::time) as minute_of_Purchase,
+    second("Time of Purchase"::time) as second_of_Purchase
+from    
+    UK_DEMO.UK_SCHEMA.UK_RAILWAY_COMPANY;
+
+//create the fact table 
+create or replace table Dim_Date_Departure
+as
+ select 
+    my_sq.nextval as Date_ID_Departure,
+    "Date of Purchase" as Date_of_Purchase,
+    dayname(to_date("Date of Journey")) as day_name_journey ,
+    monthname(to_date("Date of Journey")) as month_name_journey,
+     year(to_date("Date of Journey")) as Year_journey,
+     QUARTER(to_date("Date of Journey")) as Quanter,
+    HOUR("Departure Time"::time) as Departure_Time
+   
+from    
+    UK_DEMO.UK_SCHEMA.UK_RAILWAY_COMPANY;
+    ```
 
 
