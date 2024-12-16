@@ -167,5 +167,51 @@ the task calls the pipe to load the data into the target table, ensuring an auto
 ```
 - stream:
 After loading the file into the table, a Snowflake Stream is created on the table to capture any changes, including inserts, updates, and deletes. The Stream tracks changes in the table that occur between ETL operations, enabling real-time detection of data changes for efficient monitoring and processing.
+```CREATE OR REPLACE PROCEDURE my_update()
+RETURNS text
+LANGUAGE SQL
+AS
+$$
+DECLARE
+    sql_statement text;
+BEGIN
+    -- Prepare the dynamic SQL for merge statement
+    sql_statement := '
+    MERGE INTO UBIO_DEMO.UBIO_SCHEMA."Dim_railcard" AS Dim_railcard
+    USING (
+        SELECT 
+            RAILCARD_ID,
+            RAILCARD,
+            METADATA$ACTION,
+            METADATA$ISUPDATE
+        FROM UBIO_DEMO.UBIO_SCHEMA.DIM_RAILCARD_STREAM
+    ) AS stream
+    ON Dim_railcard."RAILCARD_ID" = stream."RAILCARD_ID"
+    
+    -- Update when matched and action is insert and isupdate is false
+    WHEN MATCHED AND stream.METADATA$ACTION = ''INSERT'' AND stream.METADATA$ISUPDATE = FALSE THEN
+        UPDATE SET 
+            Dim_railcard."RAILCARD" = stream."RAILCARD"
+    
+    -- Delete when matched and action is delete
+    WHEN MATCHED AND stream.METADATA$ACTION = ''DELETE'' THEN
+        DELETE
+    
+    -- Insert when not matched and action is insert
+    WHEN NOT MATCHED AND stream.METADATA$ACTION = ''INSERT'' THEN
+        INSERT ("RAILCARD_ID", "RAILCARD")
+        VALUES (stream."RAILCARD_ID", stream."RAILCARD");
+    ';
+
+    -- Execute the dynamic SQL
+    EXECUTE IMMEDIATE :sql_statement;
+
+    -- Return success message
+    RETURN 'Procedure executed successfully';
+END;
+$$;
+
+call my_update()
+```
 
 
