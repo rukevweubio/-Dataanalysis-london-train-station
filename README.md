@@ -297,5 +297,14 @@ as
 from    
     UK_DEMO.UK_SCHEMA.UK_RAILWAY_COMPANY;
     ```
+### project  Architecture
+- **External Data Sources**: Structured and unstructured data (APIs, databases, CSV, JSON) are sourced from external systems for processing.
+- **Snowflake**: Central data warehouse for scalable storage and querying, where data is processed and stored.
+- **Snowflake Stream**: Captures changes in source tables (inserts, updates, deletes) to enable real-time data updates via change data capture (CDC).
+- **Snowflake Tasks**: Automates SQL-based data transformations, scheduled or triggered by Streams or custom schedules.
+- **Data Transformation**: SQL queries apply business logic, data cleaning, aggregation, and enrichment to the raw data.
+- **Target Tables**: Transformed data is loaded into target tables for analysis and reporting, typically in a normalized format.
+- **SnowSQL / BI Tools**: SnowSQL enables command-line querying, while BI tools like Tableau or Power BI visualize the data and generate reports.
+[project  Architecture](
 
 
