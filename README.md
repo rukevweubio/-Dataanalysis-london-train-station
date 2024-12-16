@@ -118,3 +118,31 @@ CREATE OR REPLACE TASK my_store_procedure_dim_date
             stream."Hour_of_Purchase"
         );
 ```
+- create table in the raw stage and using the copy command to load data into table
+```// create a table  and load the data from the stage 
+ create or replace table uk_railway_company
+as 
+select 
+    $1 as "Transaction ID",
+    $2 as "Date of Purchase",
+    $3 as "Time of Purchase",
+    $4 as "Purchase Type",
+    $5 as "Payment Method",
+    $6 as "Railcard",
+    $7 as "Ticket Class",
+    $8 as "Ticket Type",
+    $9 as "Price",
+    $10 as "Departure Station",
+    $11 as "Arrival Destination",
+    $12 as "Date of Journey",
+    $13 as "Departure Time",
+    $14 as "Arrival Time",
+    $15 as "Actual Arrival Time",
+    $16 as "Journey Status",
+    $17 as "Reason for Delay",
+    $18 as "Refund Request"
+from @uk_internal_stage;
+// check if the table is created 
+select * from uk_railway_company
+```
+
