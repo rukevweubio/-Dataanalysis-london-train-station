@@ -54,11 +54,21 @@ CREATE PIPE my_pipe
 ```
 -  Snowflake Tasks for Automation:Create a task to automate transformation
 ```
-CREATE TASK my_transformation_task
-WAREHOUSE = my_warehouse
-SCHEDULE = 'USING CRON 0 2 * * * UTC'
+CREATE OR REPLACE PROCEDURE stream_on_table3()
+RETURNS VARCHAR
+LANGUAGE SQL
 AS
-INSERT INTO my_target_table
-SELECT * FROM my_source_table WHERE change_detected = TRUE;
+$$
+BEGIN
+    -- Use double quotes around the case-sensitive table name
+    EXECUTE IMMEDIATE 'CREATE OR REPLACE STREAM dim_railcard_stream ON TABLE UBIO_DEMO.UBIO_SCHEMA."Date_ID_Departure" ';
+    EXECUTE IMMEDIATE 'CREATE OR REPLACE STREAM dim_railcard_stream ON TABLE UBIO_DEMO.UBIO_SCHEMA."Dim_date"  ';
+    EXECUTE IMMEDIATE 'CREATE OR REPLACE STREAM dim_railcard_stream ON TABLE UBIO_DEMO.UBIO_SCHEMA."Dim_Tickets" ';
+    EXECUTE IMMEDIATE 'CREATE OR REPLACE STREAM dim_railcard_stream ON TABLE UBIO_DEMO.UBIO_SCHEMA."Dim_Journeys" ';
+    EXECUTE IMMEDIATE 'CREATE OR REPLACE STREAM dim_railcard_stream ON TABLE UBIO_DEMO.UBIO_SCHEMA."Dim_Station" ';
+    RETURN 'Stream created successfully';
+END;
+$$;
+;
 ```
 
