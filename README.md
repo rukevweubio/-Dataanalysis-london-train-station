@@ -145,4 +145,17 @@ from @uk_internal_stage;
 // check if the table is created 
 select * from uk_railway_company
 ```
+### Data Sources
+- Structured Data: The primary data used in the pipeline is structured data, such as transactional data, sales records, customer information, and financial data.
+- Flat Files:the Data type flat files (CSV, json)
+- Format:csv.
+### Data Flow
+The data flow through this ETL pipeline is designed to automate the process of ingesting, transforming, and loading data into Snowflake.
+The process involves loading a CSV file into Snowflake using SnowSQL, where the file is initially staged. With the help of a Snowflake Pipe,
+you automate the process of loading the data from the stage into the target table. A task is used to trigger the pipe and automate the loading 
+process. The loading operation is written as a stored procedure, which is wrapped in the task. Each time data is loaded into the stage,
+the task calls the pipe to load the data into the target table, ensuring an automated, continuous data flow.
+- stream:
+After loading the file into the table, a Snowflake Stream is created on the table to capture any changes, including inserts, updates, and deletes. The Stream tracks changes in the table that occur between ETL operations, enabling real-time detection of data changes for efficient monitoring and processing.
+
 
