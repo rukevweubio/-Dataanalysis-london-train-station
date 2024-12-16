@@ -71,4 +71,50 @@ END;
 $$;
 ;
 ```
+- create store procedure to automate the process of the pipeline
+  ```// create task for DIm_data
+CREATE OR REPLACE TASK my_store_procedure_dim_date
+  WAREHOUSE = COMPUTE_WH
+  SCHEDULE = '2 MINUTE'  
+  
+  WHEN SYSTEM$STREAM_HAS_DATA('UBIO_DEMO.UBIO_SCHEMA.DIM_DATE_STREAM_2') 
+  AS
+    MERGE INTO UBIO_DEMO.UBIO_SCHEMA."Dim_date" AS Dim_date
+    USING (
+        SELECT 
+            "Date_id",
+            "Date_of_Purchase",
+            "DAY_NAME",
+            "MONTH_NAME",
+            "Year",
+            "Quarter",
+            "Hour_of_Purchase",
+            METADATA$ACTION,
+            METADATA$ISUPDATE
+        FROM UBIO_DEMO.UBIO_SCHEMA.DIM_DATE_STREAM_2
+    ) AS stream
+    ON Dim_date."Date_id" = stream."Date_id"
 
+    -- Update when matched and action is 'INSERT' and isupdate is false
+    WHEN MATCHED AND stream.METADATA$ACTION = 'INSERT' AND stream.METADATA$ISUPDATE = FALSE THEN
+        UPDATE SET 
+            Dim_date."Date_of_Purchase" = stream."Date_of_Purchase",
+            Dim_date."DAY_NAME" = stream."DAY_NAME",
+            Dim_date."MONTH_NAME" = stream."MONTH_NAME",
+            Dim_date."Year" = stream."Year",
+            Dim_date."Quarter" = stream."Quarter",
+            Dim_date."Hour_of_Purchase" = stream."Hour_of_Purchase"
+
+    -- Insert when not matched and action is 'INSERT'
+    WHEN NOT MATCHED AND stream.METADATA$ACTION = 'INSERT' THEN
+        INSERT ("Date_id", "Date_of_Purchase", "DAY_NAME", "MONTH_NAME", "Year", "Quarter", "Hour_of_Purchase")
+        VALUES (
+            stream."Date_id", 
+            stream."Date_of_Purchase", 
+            stream."DAY_NAME", 
+            stream."MONTH_NAME", 
+            stream."Year", 
+            stream."Quarter", 
+            stream."Hour_of_Purchase"
+        );
+```
