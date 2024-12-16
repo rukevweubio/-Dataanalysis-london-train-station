@@ -213,5 +213,14 @@ $$;
 
 call my_update()
 ```
+snowflake trasformation 
+- Data transformation is automated using Snowflake Tasks, which are scheduled to run periodically or in 
+response to data changes. These tasks execute SQL transformations on raw data in staging tables, 
+applying business logic, data cleaning, aggregation, and calculations to generate the required output.
+
+
+Once data is transformed, it is loaded into the target tables within Snowflake for analysis and reporting. 
+As transformation tasks run, the data in the target tables is updated in near real-time,
+ensuring it is readily available for querying by business users or reporting tools.
 
 
