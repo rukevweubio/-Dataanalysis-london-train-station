@@ -154,7 +154,17 @@ The data flow through this ETL pipeline is designed to automate the process of i
 The process involves loading a CSV file into Snowflake using SnowSQL, where the file is initially staged. With the help of a Snowflake Pipe,
 you automate the process of loading the data from the stage into the target table. A task is used to trigger the pipe and automate the loading 
 process. The loading operation is written as a stored procedure, which is wrapped in the task. Each time data is loaded into the stage,
-the task calls the pipe to load the data into the target table, ensuring an automated, continuous data flow.
+the task calls the pipe to load the data into the target table, ensuring an automated, continuous data flow
+```CREATE OR REPLACE TASK my_store_procedure_task2
+  WAREHOUSE = COMPUTE_WH
+  SCHEDULE = '1 MINUTE'  -- Runs every minute
+  AS
+  BEGIN
+      CALL stream_on_table3();
+      CALL stream_on_table();
+      CALL stream_on_table2();
+  END;
+```
 - stream:
 After loading the file into the table, a Snowflake Stream is created on the table to capture any changes, including inserts, updates, and deletes. The Stream tracks changes in the table that occur between ETL operations, enabling real-time detection of data changes for efficient monitoring and processing.
 
